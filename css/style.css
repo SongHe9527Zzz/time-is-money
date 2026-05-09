@@ -692,6 +692,73 @@ html, body {
 }
 .fullscreen-hint.hidden { display: none; }
 
+/* ===== Poster Overlay (long-press save) ===== */
+.poster-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+.poster-overlay.hidden { opacity: 0; pointer-events: none; }
+.poster-overlay-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.poster-overlay-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.poster-overlay-inner img {
+  max-width: 90vw;
+  max-height: 75vh;
+  border-radius: 16px;
+  box-shadow: 0 0 60px rgba(212, 175, 55, 0.2), 0 8px 40px rgba(0, 0, 0, 0.6);
+  /* Prevent iOS from treating long-press as text selection */
+  -webkit-touch-callout: default;
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+.poster-overlay-hint {
+  font-size: 15px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  animation: float 2s ease-in-out infinite;
+  text-align: center;
+}
+.poster-overlay-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
+}
+.poster-overlay-close:active {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+}
+
 /* ===== Share Prompt (exit fullscreen) ===== */
 .share-prompt {
   position: fixed;
@@ -848,13 +915,37 @@ html, body {
   .poster-rate { font-size: 48px; }
 }
 
-/* ===== Responsive (large screens) ===== */
+/* ===== Desktop / Large Screens ===== */
 @media (min-width: 768px) {
-  .money-integer { font-size: 200px; }
-  .money-symbol { font-size: 64px; }
-  .money-decimal { font-size: 56px; }
-  .input-container { max-width: 420px; }
+  .money-integer { font-size: clamp(140px, 20vw, 260px); }
+  .money-symbol { font-size: clamp(48px, 7vw, 72px); }
+  .money-decimal { font-size: clamp(44px, 6vw, 66px); }
+
+  .input-container { max-width: 440px; }
+  .input-title { font-size: 32px; }
+  .salary-input { font-size: 32px; }
+  .quick-btn { font-size: 15px; padding: 14px 12px; }
+  .start-btn { font-size: 18px; padding: 18px; }
+
+  .rate-bar { padding: 12px 24px; }
+  .rate-label { font-size: 12px; }
+  .rate-value { font-size: 16px; }
+
+  .conversion-ticker { padding: 12px 24px; }
+  .ticker-text { font-size: 14px; }
+
+  .share-btn-float { padding: 14px 24px; font-size: 15px; }
+
+  .poster-overlay-inner img { max-height: 80vh; max-width: min(375px, 60vw); }
 }
+
+/* Extra large screens */
+@media (min-width: 1200px) {
+  .money-integer { font-size: 280px; }
+  .money-symbol { font-size: 80px; }
+  .money-decimal { font-size: 72px; }
+}
+
 @media (prefers-color-scheme: light) {
   /* Force dark — this app has no light mode */
 }

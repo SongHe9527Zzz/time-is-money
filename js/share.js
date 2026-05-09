@@ -1,5 +1,6 @@
 /**
- * Poster generation via html2canvas and Web Share API.
+ * Poster generation via html2canvas.
+ * Shows full-screen overlay for long-press save — no system dialogs.
  */
 class ShareEngine {
   static async share(secondRate, monthlySalary, hourlyRate) {
@@ -14,7 +15,6 @@ class ShareEngine {
     ShareEngine.showToast('正在生成海报...');
 
     try {
-      // Populate poster data
       const rateEl = document.getElementById('poster-rate');
       const hourlyEl = document.getElementById('poster-hourly');
       const dailyEl = document.getElementById('poster-daily');
@@ -30,6 +30,7 @@ class ShareEngine {
       if (annualEl) annualEl.textContent = '¥' + (annualRate / 10000).toFixed(1) + '万';
       if (bragRateEl) bragRateEl.textContent = '¥' + secondRate.toFixed(4);
 
+      // Preload QR code
       if (qrImg) {
         const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='
           + encodeURIComponent(window.location.href);
@@ -37,85 +38,94 @@ class ShareEngine {
       }
 
       ShareEngine.drawPosterBg();
-
       poster.style.top = '0';
       poster.style.left = '0';
       poster.style.zIndex = '100';
 
+      // Wait for QR image
       if (qrImg && qrImg.src) {
-        await new Promise((resolve) => {
+        await new Promise(function (resolve) {
           if (qrImg.complete) { resolve(); return; }
           qrImg.onload = resolve;
           qrImg.onerror = resolve;
           setTimeout(resolve, 3000);
         });
       }
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(function (r) { setTimeout(r, 300); });
 
       const canvas = await html2canvas(poster, {
         backgroundColor: '#060606',
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
       });
 
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      const file = new File([blob], 'time-is-money.png', { type: 'image/png' });
+      poster.style.top = '-9999px';
+      poster.style.left = '-9999px';
+      poster.style.zIndex = '';
 
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: 'Time is Money - 我的时间价值',
-          text: '我的时间价值 ¥' + secondRate.toFixed(4) + '/秒，你也来测测？',
-          files: [file],
-        });
-      } else if (navigator.share) {
-        await navigator.share({
-          title: 'Time is Money - 我的时间价值',
-          text: '我的时间价值 ¥' + secondRate.toFixed(4) + '/秒，你也来测测？',
-          url: window.location.href,
-        });
-      } else {
-        const link = document.createElement('a');
-        link.download = 'time-is-money.png';
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
-      }
+      // Show overlay for long-press save
+      ShareEngine.showPosterOverlay(canvas.toDataURL('image/png'));
     } catch (err) {
-      if (err.name !== 'AbortError') {
-        ShareEngine.showToast('分享失败，请重试');
-      }
+      ShareEngine.showToast('生成失败，请重试');
+      poster.style.top = '-9999px';
+      poster.style.left = '-9999px';
+      poster.style.zIndex = '';
+    }
+  }
+
+  static showPosterOverlay(dataUrl) {
+    var overlay = document.getElementById('poster-overlay');
+    var img = document.getElementById('poster-overlay-img');
+    if (!overlay || !img) return;
+
+    img.src = dataUrl;
+    overlay.classList.remove('hidden');
+
+    // Close on button click
+    var closeBtn = document.getElementById('poster-overlay-close');
+    if (closeBtn) {
+      closeBtn.onclick = function (e) {
+        e.stopPropagation();
+        overlay.classList.add('hidden');
+      };
     }
 
-    poster.style.top = '-9999px';
-    poster.style.left = '-9999px';
-    poster.style.zIndex = '';
+    // Close on background tap (but not on image long-press)
+    overlay.onclick = function (e) {
+      if (e.target === overlay || e.target.classList.contains('poster-overlay-bg')) {
+        overlay.classList.add('hidden');
+      }
+    };
+
+    try { navigator.vibrate(10); } catch (_) {}
   }
 
   static drawPosterBg() {
-    const canvas = document.getElementById('poster-canvas-bg');
+    var canvas = document.getElementById('poster-canvas-bg');
     if (!canvas) return;
     canvas.width = 375;
     canvas.height = 667;
-    const ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
 
-    const topGrad = ctx.createRadialGradient(187, 120, 10, 187, 120, 350);
+    var topGrad = ctx.createRadialGradient(187, 120, 10, 187, 120, 350);
     topGrad.addColorStop(0, 'rgba(212, 175, 55, 0.06)');
     topGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = topGrad;
     ctx.fillRect(0, 0, 375, 667);
 
-    const botGrad = ctx.createRadialGradient(187, 580, 10, 187, 580, 250);
+    var botGrad = ctx.createRadialGradient(187, 580, 10, 187, 580, 250);
     botGrad.addColorStop(0, 'rgba(212, 175, 55, 0.04)');
     botGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = botGrad;
     ctx.fillRect(0, 0, 375, 667);
 
-    for (let i = 0; i < 40; i++) {
-      const x = Math.random() * 375;
-      const y = Math.random() * 667;
-      const r = Math.random() * 1.2 + 0.3;
-      const alpha = Math.random() * 0.25 + 0.05;
+    for (var i = 0; i < 40; i++) {
+      var x = Math.random() * 375;
+      var y = Math.random() * 667;
+      var r = Math.random() * 1.2 + 0.3;
+      var alpha = Math.random() * 0.25 + 0.05;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(212, 175, 55, ' + alpha + ')';
@@ -142,7 +152,7 @@ class ShareEngine {
   }
 
   static showToast(msg) {
-    const toast = document.getElementById('toast');
+    var toast = document.getElementById('toast');
     if (!toast) return;
     toast.textContent = msg;
     toast.classList.remove('hidden');
