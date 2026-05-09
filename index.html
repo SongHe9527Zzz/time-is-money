@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Time is Money">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="你的时间，价值几何？">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+  <title>Time is Money</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+  <!-- ===== INPUT SCREEN ===== -->
+  <div id="input-screen" class="screen">
+    <div class="input-container">
+      <div class="input-logo">⏳</div>
+      <h1 class="input-title">Time is Money</h1>
+      <p class="input-subtitle">你的时间，价值几何？</p>
+
+      <div class="salary-input-wrapper">
+        <span class="currency-sign">¥</span>
+        <input type="number" id="salary-input" class="salary-input"
+               placeholder="输入月薪" inputmode="numeric" min="1" max="99999999">
+        <span class="input-unit">/ 月</span>
+      </div>
+
+      <div class="quick-options">
+        <button class="quick-btn" data-salary="5000">
+          <span class="quick-emoji">🍚</span>刚够温饱
+        </button>
+        <button class="quick-btn" data-salary="15000">
+          <span class="quick-emoji">☕</span>小有所成
+        </button>
+        <button class="quick-btn" data-salary="30000">
+          <span class="quick-emoji">🚀</span>大厂P7
+        </button>
+        <button class="quick-btn" data-salary="100000">
+          <span class="quick-emoji">👑</span>霸道总裁
+        </button>
+      </div>
+
+      <button id="start-btn" class="start-btn" disabled>输入月薪，开始搞钱</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN SCREEN ===== -->
+  <div id="main-screen" class="screen hidden">
+    <div class="rate-bar">
+      <div class="rate-item">
+        <span class="rate-label">时薪</span>
+        <span class="rate-value gold" id="hourly-rate">¥0</span>
+      </div>
+      <div class="rate-divider"></div>
+      <div class="rate-item">
+        <span class="rate-label">分薪</span>
+        <span class="rate-value gold" id="minute-rate">¥0</span>
+      </div>
+      <div class="rate-divider"></div>
+      <div class="rate-item">
+        <span class="rate-label">秒薪</span>
+        <span class="rate-value gold" id="second-rate">¥0</span>
+      </div>
+    </div>
+
+    <div class="money-counter" id="money-counter">
+      <div class="money-line">
+        <span class="money-symbol">¥</span>
+        <span class="money-integer" id="money-integer">0</span>
+        <span class="money-decimal" id="money-decimal"></span>
+      </div>
+    </div>
+
+    <div class="conversion-ticker" id="conversion-ticker">
+      <span class="ticker-icon">💡</span>
+      <span class="ticker-text" id="ticker-text"></span>
+    </div>
+
+    <div id="milestone-popup" class="milestone-popup hidden">
+      <div class="milestone-fireworks" id="milestone-fireworks"></div>
+      <div class="milestone-card">
+        <div class="milestone-icon">🎉</div>
+        <div class="milestone-title" id="milestone-title"></div>
+        <div class="milestone-amount gold" id="milestone-amount"></div>
+      </div>
+    </div>
+
+    <div id="longpress-overlay" class="longpress-overlay hidden">
+      <div class="longpress-label">年薪投影</div>
+      <div class="longpress-value gold" id="annual-projection">¥0</div>
+      <div class="longpress-hint">松手返回</div>
+    </div>
+
+    <div id="daily-card" class="daily-card hidden">
+      <div class="daily-card-inner">
+        <div class="daily-icon">📊</div>
+        <div class="daily-title">今日已赚</div>
+        <div class="daily-amount gold" id="daily-amount">¥0</div>
+        <div class="daily-sub">截止此刻</div>
+        <div class="daily-actions">
+          <button class="daily-btn daily-share-btn" id="daily-share-btn">📤 分享战绩</button>
+          <button class="daily-btn daily-close-btn" id="daily-close-btn">继续搞钱</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-controls" id="bottom-controls">
+      <button class="icon-btn" id="reset-btn" aria-label="重置">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="share-btn-float" id="share-btn" aria-label="分享">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      <span>分享</span>
+    </button>
+  </div>
+
+  <!-- ===== SHARE POSTER (hidden) ===== -->
+  <div id="share-poster" class="share-poster">
+    <canvas class="poster-canvas-bg" id="poster-canvas-bg"></canvas>
+    <div class="poster-content">
+      <div class="poster-top-label">⏳ TIME IS MONEY</div>
+      <div class="poster-headline">我的时间价值</div>
+      <div class="poster-rate-block">
+        <span class="poster-rate gold" id="poster-rate">¥0.0000</span>
+        <span class="poster-rate-unit">/ 秒</span>
+      </div>
+      <div class="poster-divider"><span></span></div>
+      <div class="poster-stats">
+        <div class="poster-stat">
+          <span class="poster-stat-val gold" id="poster-hourly">¥0</span>
+          <span class="poster-stat-label">时薪</span>
+        </div>
+        <div class="poster-stat">
+          <span class="poster-stat-val gold" id="poster-daily">¥0</span>
+          <span class="poster-stat-label">日薪</span>
+        </div>
+        <div class="poster-stat">
+          <span class="poster-stat-val gold" id="poster-annual">¥0</span>
+          <span class="poster-stat-label">年薪</span>
+        </div>
+      </div>
+      <div class="poster-brag">
+        "看着我的身价每秒暴涨 <span class="gold" id="poster-brag-rate">¥0.0000</span>"
+      </div>
+      <div class="poster-bottom">
+        <div class="poster-qr">
+          <img id="poster-qr-img" src="" alt="扫码" width="88" height="88" crossorigin="anonymous">
+        </div>
+        <div class="poster-bottom-text">
+          <div class="poster-brand">Time is Money</div>
+          <div class="poster-cta">长按识别二维码 · 测测你的身价</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="js/convert.js"></script>
+  <script src="js/ticker.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
