@@ -57,7 +57,7 @@ class ConvertEngine {
     } else {
       countStr = count.toFixed(3);
     }
-    return `已赚到 ${countStr} ${item.unit}${item.name}`;
+    return `已赚到 ${countStr} ${item.name}`;
   }
 
   /** Pick a random item for variety in ticker */
@@ -74,6 +74,6 @@ class ConvertEngine {
     else if (count >= 10) countStr = count.toFixed(1);
     else if (count >= 1) countStr = count.toFixed(1);
     else countStr = count.toFixed(3);
-    return `已赚到 ${countStr} ${item.unit}${item.name}`;
+    return `已赚到 ${countStr} ${item.name}`;
   }
 }
