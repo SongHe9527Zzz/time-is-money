@@ -33,7 +33,7 @@ class ShareEngine {
       // Preload QR code
       if (qrImg) {
         const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='
-          + encodeURIComponent(window.location.href);
+          + encodeURIComponent(window.location.origin + window.location.pathname + '?ref=share');
         qrImg.src = qrUrl;
       }
 

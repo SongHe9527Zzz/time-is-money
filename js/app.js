@@ -41,8 +41,11 @@
     particles.start();
     effects = new EffectsEngine(particles);
 
+    // If came from QR share link, always show input screen for new visitors
+    const fromShare = /[?&]ref=share/.test(window.location.search);
+
     // Check for saved state
-    const saved = loadState();
+    const saved = fromShare ? null : loadState();
     if (saved) {
       inputScreen.classList.add('hidden');
       ticker = new MoneyTicker(saved.monthlySalary);
