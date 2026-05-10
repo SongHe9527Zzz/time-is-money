@@ -22,7 +22,7 @@ const ITEMS = [
   { name: '台iPhone', price: 8000, emoji: '📱', unit: '台' },
   { name: '张去冰岛的机票', price: 12000, emoji: '✈️', unit: '张' },
   { name: '块劳力士基础款', price: 50000, emoji: '⌚', unit: '块' },
-  { name: '辆特斯拉首付', price: 80000, emoji: '🚗', unit: '份' },
+  { name: '份特斯拉首付', price: 80000, emoji: '🚗', unit: '份' },
   { name: '平米学区房', price: 100000, emoji: '🏠', unit: '平米' },
 ];
 
